@@ -1,0 +1,45 @@
+<div id="modal-review-form" class="modal review-for-detail" data-reveal>
+    <div class="modal-header">
+        <h2 class="modal-header-title">Request A Quote</h2>
+        <a href="#" class="modal-close" aria-label="{{lang 'common.close'}}" role="button">
+            <span aria-hidden="true">&#215;</span>
+        </a>
+    </div>
+    <div class="modal-body">
+        <div class="writeReview-productDetails">
+            <img src="{{getImage product.main_image 'product_size' (cdn theme_settings.default_image_product)}}">
+            <h6 class="product-brand">{{ product.brand.name }}</h6>
+            <h5 class="product-title">{{ product.title }}</h5>
+            <h5 class="product-sku">{{ product.sku }}</h5>
+        </div>
+        
+        <div class="form writeReview-form">
+            <script src="https://elfsightcdn.com/platform.js" async></script>
+            
+            <div id="my-elfsight-widget" 
+                 class="elfsight-app-8b467453-2abb-4d64-8354-708139503fcf"   data-elfsight-app-lazy>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+(function () {
+  var skuEl = document.querySelector('.product-sku');
+  if (!skuEl) return;
+
+  var sku = (skuEl.textContent || '').trim();
+  if (!sku) return;
+
+  var url = new URL(window.location.href);
+
+  // if already set, do nothing
+  if (url.searchParams.get('sku') === sku) return;
+
+  url.searchParams.set('sku', sku);
+  window.history.replaceState(null, '', url.toString());
+})();
+</script>
+
