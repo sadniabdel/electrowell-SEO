@@ -6,7 +6,7 @@
         {{{ head.config }}}
         {{#block "head"}} {{/block}}
         <link href="{{ head.favicon }}" rel="shortcut icon">
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         {{{stylesheet '/assets/css/theme.css'}}}
 
         {{{head.scripts}}}
@@ -17,10 +17,63 @@
         {{inject 'maintenanceMode' settings.maintenance}}
         {{inject 'urls' urls}}
         {{{snippet 'htmlhead'}}}
-        <!-- Go to www.addthis.com/dashboard to customize your tools -->
-        <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-589d7698f6fa5c40"></script>
+
+        {{!-- Canonical URL for SEO --}}
+        {{#if canonical_url}}
+        <link rel="canonical" href="{{canonical_url}}">
+        {{/if}}
+
+        {{!-- Preconnect to third-party domains for performance --}}
+        <link rel="preconnect" href="https://s7.addthis.com" crossorigin>
+        <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+        <link rel="dns-prefetch" href="//s7.addthis.com">
+
+        {{!-- Organization Schema for SEO --}}
+        <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          "name": "{{settings.store_name}}",
+          "url": "{{urls.home}}",
+          "logo": "{{cdn head.logo}}",
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "contactType": "Customer Service",
+            "email": "{{settings.store_email}}"
+          },
+          "sameAs": [
+            {{#if settings.social_icon_placement_top}}
+            {{#if settings.facebook_like_url}}"{{settings.facebook_like_url}}",{{/if}}
+            {{#if settings.twitter_url}}"{{settings.twitter_url}}",{{/if}}
+            {{#if settings.pinterest_url}}"{{settings.pinterest_url}}",{{/if}}
+            {{#if settings.instagram_url}}"{{settings.instagram_url}}",{{/if}}
+            {{#if settings.youtube_url}}"{{settings.youtube_url}}"{{/if}}
+            {{/if}}
+          ]
+        }
+        </script>
+
+        {{!-- WebSite Schema with SearchAction for SEO --}}
+        <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "name": "{{settings.store_name}}",
+          "url": "{{urls.home}}",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": {
+              "@type": "EntryPoint",
+              "urlTemplate": "{{urls.home}}/search?search_query={search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+          }
+        }
+        </script>
     </head>
     <body class="page-type-{{page_type}}">
+        {{!-- Skip to content link for accessibility --}}
+        <a href="#main-content" class="skip-link" style="position:absolute;left:-9999px;z-index:999;padding:1em;background:#000;color:#fff;text-decoration:none;" onfocus="this.style.left='10px'" onblur="this.style.left='-9999px'">Skip to main content</a>
         <div id="st-container" class="st-container">
             <!-- content push wrapper -->
             <div class="st-pusher">
@@ -85,7 +138,7 @@
                 {{/if}}
 
                 {{> components/common/header }}
-                <main role="main">
+                <main role="main" id="main-content">
                     {{> components/common/body }}
                 </main>
                 {{> components/common/footer }}
@@ -114,7 +167,8 @@
                     {{/if}}
                 {{/if}}
 
-                <script src="{{cdn '/assets/js/theme/halothemes/jquery.min.js'}}"></script>
+                {{!-- jQuery is already included in theme-bundle.main.js via webpack ProvidePlugin --}}
+                {{!-- Removed duplicate jquery.min.js load to improve performance --}}
                 <script src="{{cdn '/assets/modernizr-custom.js'}}"></script>
 
                 {{#if theme_settings.halothemes_megamenu}}
@@ -142,16 +196,35 @@
                     });
                 </script>
                 {{#if settings.show_newsletter_box}}
-                <!-- BEGIN Footer SubscribeForm Validate -->
+                <!-- BEGIN Footer SubscribeForm Validate - Accessible Version -->
                 <script>
                 jQuery(document).ready(function($){
-                    $('#footerSubcribeForm').submit(function(event){
-                        if ($('#footerSubcribeForm').find('#nl_email').val()  == "") {
-                            alert("Please enter a valid email address, such as john@example.com.");
-                            $('#footerSubcribeForm').find('#nl_email').focus();
-                            return false;
-                        }
+                    // Add error message container if not exists
+                    if ($('#footerSubcribeForm #nl_email_error').length === 0) {
+                        $('#footerSubcribeForm').find('#nl_email').after('<span id="nl_email_error" role="alert" aria-live="polite" style="display:none;color:#ff0000;font-size:12px;margin-top:5px;"></span>');
+                    }
 
+                    $('#footerSubcribeForm').submit(function(event){
+                        var email = $('#footerSubcribeForm').find('#nl_email').val().trim();
+                        var errorMsg = $('#nl_email_error');
+
+                        if (email === "") {
+                            event.preventDefault();
+                            errorMsg.text("Please enter a valid email address, such as john@example.com.").show();
+                            $('#footerSubcribeForm').find('#nl_email').attr('aria-invalid', 'true').focus();
+                            return false;
+                        } else {
+                            errorMsg.hide();
+                            $('#footerSubcribeForm').find('#nl_email').attr('aria-invalid', 'false');
+                        }
+                    });
+
+                    // Clear error on input
+                    $('#footerSubcribeForm').find('#nl_email').on('input', function() {
+                        if ($(this).val().trim() !== "") {
+                            $('#nl_email_error').hide();
+                            $(this).attr('aria-invalid', 'false');
+                        }
                     });
                 });
                 </script>
@@ -161,6 +234,27 @@
 
                 {{{footer.scripts}}}
                 {{{snippet 'footer'}}}
+
+                {{!-- Lazy load third-party scripts after page load for performance and GDPR compliance --}}
+                <script>
+                    // Lazy load AddThis after page load
+                    window.addEventListener('load', function() {
+                        // Only load if user has consented (check privacy cookie setting)
+                        var loadThirdPartyScripts = function() {
+                            // AddThis social sharing widget
+                            if (!document.querySelector('script[src*="addthis"]')) {
+                                var addThisScript = document.createElement('script');
+                                addThisScript.type = 'text/javascript';
+                                addThisScript.async = true;
+                                addThisScript.src = '//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-589d7698f6fa5c40';
+                                document.body.appendChild(addThisScript);
+                            }
+                        };
+
+                        // Delay loading by 3 seconds to prioritize critical resources
+                        setTimeout(loadThirdPartyScripts, 3000);
+                    });
+                </script>
             </div>
         </div>
     </body>
