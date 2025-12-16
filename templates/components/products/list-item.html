@@ -2,7 +2,13 @@
     <figure class="card-figure">
         <div class="prod-image">
             <a href="{{url}}">
-                <img class="card-image" src="{{getImage image 'productgallery_size' (cdn theme_settings.default_image_product)}}" alt="{{image.alt}}" title="{{image.alt}}">
+                <img class="card-image"
+                src="{{getImage image 'productgallery_size' (cdn theme_settings.default_image_product)}}"
+                width="210"
+                height="280"
+                alt="{{image.alt}}"
+                title="{{image.alt}}"
+                loading="lazy">
             </a>
             <div class="actions">
                 <a href="/wishlist.php?action=add&product_id={{id}}" class="btnWL hidden-xs hidden-sm hidden-md">{{lang 'account.wishlists.add_item'}}</a>
