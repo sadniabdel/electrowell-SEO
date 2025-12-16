@@ -15,17 +15,7 @@
             <h5 class="product-title">{{ product.title }}</h5>
         </div>
         <div class="form writeReview-form">
-            <script>
-                // Lazy load Elfsight only when size chart is opened
-                if (typeof window.elfsightLoaded === 'undefined') {
-                    window.elfsightLoaded = false;
-                    var elfsightScript = document.createElement('script');
-                    elfsightScript.src = 'https://elfsightcdn.com/platform.js';
-                    elfsightScript.async = true;
-                    document.body.appendChild(elfsightScript);
-                    window.elfsightLoaded = true;
-                }
-            </script>
+            <script src="https://elfsightcdn.com/platform.js" async></script>
             <div class="elfsight-app-e85b8507-13e9-440f-8402-3b38ed24bd61" data-elfsight-app-lazy></div>
         </div>
         </div>

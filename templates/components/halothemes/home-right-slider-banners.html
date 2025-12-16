@@ -4,20 +4,7 @@
 	<!-- Begin Banners -->
 	<div class="banner-item wow fadeInUp animated" data-wow-delay="100ms">
 
-    <script>
-        // Lazy load Elfsight platform after initial page load
-        window.addEventListener('load', function() {
-            setTimeout(function() {
-                if (!document.querySelector('script[src*="elfsight.com/platform"]')) {
-                    var elfsightScript = document.createElement('script');
-                    elfsightScript.src = 'https://static.elfsight.com/platform/platform.js';
-                    elfsightScript.setAttribute('data-use-service-core', '');
-                    elfsightScript.defer = true;
-                    document.body.appendChild(elfsightScript);
-                }
-            }, 2000);
-        });
-    </script>
+    <script src="https://static.elfsight.com/platform/platform.js" data-use-service-core defer></script>
     <div class="elfsight-app-e85b8507-13e9-440f-8402-3b38ed24bd61" data-elfsight-app-lazy></div>
 
 	</div>
