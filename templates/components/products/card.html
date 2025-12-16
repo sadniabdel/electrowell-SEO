@@ -2,7 +2,11 @@
     <figure class="card-figure">
         <div class="prod-image">
             <a href="{{url}}">
-                <img class="card-image lazyload" src="{{cdn 'img/loading.svg'}}" data-src="{{getImage image 'productgallery_size' (cdn theme_settings.default_image_product)}}"
+                <img class="card-image lazyload"
+                src="{{cdn 'img/loading.svg'}}"
+                data-src="{{getImage image 'productgallery_size' (cdn theme_settings.default_image_product)}}"
+                width="210"
+                height="280"
                 {{#if theme_settings.halothemes_images_swap}}
                 {{#if images.length '>=' 2}}
                 {{#each images}}
@@ -12,7 +16,9 @@
                 {{/each}}
                 {{/if}}
                 {{/if}}
-                alt="{{image.alt}}" title="{{image.alt}}">
+                alt="{{image.alt}}"
+                title="{{image.alt}}"
+                loading="lazy">
             </a>
             <a href="/wishlist.php?action=add&product_id={{id}}" class="btnWL hidden-xs hidden-sm hidden-md" title="{{lang 'account.wishlists.add_item'}}">Wishlist</a>
             <div class="actions">
